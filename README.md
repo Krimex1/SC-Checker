@@ -50,6 +50,7 @@ version = "1.2.3.4"
 - Screenshots via Playwright, interactive graph, AI analysis
 - Discord / Telegram / Slack webhooks, plugin system
 - Proxy support (HTTP/HTTPS/SOCKS5), auto-update, EN/RU interface
+- And more
 
 ---
 
