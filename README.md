@@ -28,7 +28,7 @@
 |----------------|------------------|
 | `major` | `minor`, `patch` |
 | `minor` | `patch` |
-| `patch` |
+| `patch` | `nothing` |
 
 ## Формат в коде
 
