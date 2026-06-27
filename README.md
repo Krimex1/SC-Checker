@@ -1,6 +1,6 @@
 # SC Checker
 
-Инструмент аудита веб-сурфейса для специалистов по информационной безопасности. / A web surface audit tool for information security professionals.
+Open-source инструмент аудита веб-сурфейса для специалистов по информационной безопасности. / A web surface audit tool for information security professionals.
 
 # Рекомендуется использовать последнюю версию программы для корректной работы всех функций, точных проверок и максимальной стабильности системы.
 
