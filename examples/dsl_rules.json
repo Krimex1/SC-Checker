@@ -1,0 +1,23 @@
+[
+  "IF critical_paths_count > 0 THEN",
+  "  ASSERT risk_score > 20",
+  "ELSE",
+  "  ASSERT risk_score >= 0",
+  "END",
+
+  "IF open_ports_count > 10 THEN",
+  "  ASSERT risk_score > 10",
+  "END",
+
+  "IF ssl_weak_cipher == true THEN",
+  "  ASSERT risk_score > 30",
+  "END",
+
+  "FOR $port IN open_ports",
+  "  ASSERT $port > 0",
+  "END",
+
+  "FOR $sub IN subdomains",
+  "  CAPTURE \"www\" FROM target",
+  "END"
+]

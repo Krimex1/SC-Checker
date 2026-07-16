@@ -1,0 +1,10 @@
+{
+  "name": "Critical Path Alert",
+  "version": "1.0.0",
+  "author": "SC Checker",
+  "hooks": ["on_scan_complete"],
+  "condition": "critical_paths_count > 0",
+  "action": "append_finding",
+  "severity": "CRITICAL",
+  "message": "Found {critical_paths_count} critical paths on {target}"
+}

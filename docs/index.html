@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SC Checker Go v2.0.0 — Documentation</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --sidebar-bg: #161b22;
+  --card-bg: #1a1e27;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --text-dim: #8b949e;
+  --accent: #58a6ff;
+  --accent-dim: #1f6feb;
+  --green: #3fb950;
+  --orange: #d2991d;
+  --red: #f85149;
+  --code-bg: #0d1117;
+  --hover: #1f2937;
+}
+* { box-sizing:border-box; margin:0; padding:0 }
+body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display:flex; min-height:100vh; font-size:15px; line-height:1.6 }
+#sidebar { width:280px; min-width:280px; background: var(--sidebar-bg); border-right:1px solid var(--border); padding:20px 0; position:sticky; top:0; height:100vh; overflow-y:auto }
+#sidebar .logo { padding:0 20px 16px; border-bottom:1px solid var(--border); margin-bottom:8px }
+#sidebar .logo h1 { font-size:18px; color:#fff }
+#sidebar .logo .ver { font-size:12px; color:var(--accent); margin-top:2px }
+#sidebar nav a { display:block; padding:7px 20px; color:var(--text-dim); text-decoration:none; font-size:13.5px; border-left:3px solid transparent; transition:.15s }
+#sidebar nav a:hover, #sidebar nav a.active { color:#fff; background:var(--hover); border-left-color:var(--accent) }
+#sidebar nav a.active { font-weight:600 }
+#search-wrap { padding:8px 20px 12px }
+#search { width:100%; padding:7px 12px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; outline:none }
+#search:focus { border-color:var(--accent) }
+#main { flex:1; padding:32px 48px; max-width:880px; overflow-y:auto }
+#main section { display:none; animation:fadeIn .25s }
+#main section.active { display:block }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:translateY(0) } }
+h2 { font-size:24px; color:#fff; margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border) }
+h3 { font-size:18px; color:#fff; margin:24px 0 10px }
+h4 { font-size:15px; color:var(--text-dim); margin:16px 0 6px }
+p { margin:0 0 12px; color:var(--text-dim) }
+a { color:var(--accent) }
+ul, ol { margin:0 0 12px 20px; color:var(--text-dim) }
+li { margin-bottom:4px }
+code { background:var(--code-bg); padding:1px 6px; border-radius:4px; font-size:13px; font-family:'Cascadia Code','Fira Code','Consolas',monospace; color:var(--green) }
+pre { background:var(--code-bg); padding:14px 18px; border-radius:8px; border:1px solid var(--border); overflow-x:auto; margin:0 0 16px; font-size:13px; line-height:1.5 }
+pre code { background:none; padding:0; color:var(--text) }
+.card { background:var(--card-bg); border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:0 0 16px }
+.card h4 { margin:0 0 8px; color:#fff }
+.tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; margin-right:4px }
+.tag-g { background:#1a3a2a; color:var(--green) }
+.tag-o { background:#3a2a1a; color:var(--orange) }
+.tag-r { background:#3a1a1a; color:var(--red) }
+.tag-b { background:#1a2a3a; color:var(--accent) }
+table { width:100%; border-collapse:collapse; margin:0 0 16px; font-size:13px }
+th { text-align:left; padding:8px 12px; border-bottom:2px solid var(--border); color:var(--text-dim); font-weight:600 }
+td { padding:8px 12px; border-bottom:1px solid var(--border) }
+tr:hover td { background:var(--hover) }
+.chk { color:var(--green) }
+.mis { color:var(--red) }
+.step { display:flex; align-items:flex-start; margin:0 0 16px }
+.step-num { background:var(--accent-dim); color:#fff; width:28px; height:28px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; margin-right:12px }
+.step-text { color:var(--text-dim); padding-top:3px }
+.step-text strong { color:#fff }
+@media (max-width:768px) { body { flex-direction:column } #sidebar { width:100%; min-width:100%; position:static; height:auto; border-right:none; border-bottom:1px solid var(--border) } #main { padding:20px } }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div class="logo">
+    <h1>SC Checker Go</h1>
+    <div class="ver">v2.0.0 — Web Security Scanner</div>
+  </div>
+  <div id="search-wrap"><input id="search" placeholder="Search docs..." oninput="filterNav(this.value)"></div>
+  <nav id="nav">
+    <a href="#overview" class="active" data-section="overview">Overview</a>
+    <a href="#quickstart" data-section="quickstart">Quick Start</a>
+    <a href="#features" data-section="features">Features</a>
+    <a href="#scan-workflow" data-section="scan-workflow">Scan Workflow</a>
+    <a href="#security-checks" data-section="security-checks">Security Checks</a>
+    <a href="#injections" data-section="injections">Injection Testing</a>
+    <a href="#path-brute" data-section="path-brute">Path Brute-Force</a>
+    <a href="#advanced-checks" data-section="advanced-checks">Advanced Checks</a>
+    <a href="#risk-scoring" data-section="risk-scoring">Risk Scoring</a>
+    <a href="#dsl" data-section="dsl">DSL Rules Engine</a>
+    <a href="#plugins" data-section="plugins">Plugins</a>
+    <a href="#custom-lists" data-section="custom-lists">Custom Lists</a>
+    <a href="#webhooks" data-section="webhooks">Webhooks</a>
+    <a href="#proxy" data-section="proxy">Proxy Settings</a>
+    <a href="#export" data-section="export">Report Export</a>
+    <a href="#auto-update" data-section="auto-update">Auto-Update</a>
+  </nav>
+</div>
+
+<div id="main">
+
+<!-- OVERVIEW -->
+<section id="overview" class="active">
+<h2>Overview</h2>
+<p>SC Checker Go is a comprehensive web security scanner written in Go. It performs automated reconnaissance, vulnerability assessment, and security analysis of web applications and servers.</p>
+
+<div class="card">
+<h4>Tech Stack</h4>
+<table>
+<tr><td style="width:160px">Language</td><td>Go 1.26</td></tr>
+<tr><td>GUI</td><td>Fyne v2 (desktop)</td></tr>
+<tr><td>HTTP</td><td>net/http with connection pool (24 concurrent clients)</td></tr>
+<tr><td>Concurrency</td><td>Goroutines</td></tr>
+<tr><td>Encryption</td><td>AES-256-GCM for secrets</td></tr>
+<tr><td>SSRF Protection</td><td>DNS-pinning for webhooks</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h4>Key Capabilities</h4>
+<ul>
+  <li><strong>35+ security checks</strong> — headers, SSL/TLS, cookies, CORS, HSTS, WAF detection</li>
+  <li><strong>Injection testing</strong> — SQL, XSS, SSTI, CRLF, Host Header, Dir Traversal, Open Redirect</li>
+  <li><strong>Port scanning</strong> — 34 common ports + custom, banner grabbing</li>
+  <li><strong>Path brute-force</strong> — 8 framework wordlists (WordPress, Laravel, Drupal, Joomla, Spring, Django, Next.js, Node.js)</li>
+  <li><strong>Advanced checks</strong> — JWT, GraphQL, WebSocket, HTTP Smuggling, Supply Chain, Email Security</li>
+  <li><strong>Reconnaissance</strong> — DNS records, subdomains, WHOIS, Shodan, Certificate Transparency, IP geolocation</li>
+  <li><strong>DSL engine</strong> — Custom rule language with AST-based parser and safety validation</li>
+  <li><strong>Plugin system</strong> — JSON + external executable plugins, 9 lifecycle hooks</li>
+  <li><strong>Webhook notifications</strong> — Discord, Slack, Telegram, Pushover, Custom (with SSRF protection)</li>
+  <li><strong>Auto-update</strong> — GitHub-based with SHA256 verification</li>
+</ul>
+</div>
+
+<div class="card">
+<h4>Architecture</h4>
+<pre><code>sc-checker-go/
+├── cmd/sc-checker/main.go       Application entry point
+├── internal/
+│   ├── config/config.go         Constants, port lists, header lists
+│   ├── engine/
+│   │   ├── engine.go            Core scan orchestrator (28 stages)
+│   │   ├── client.go            HTTP client pool with UA rotation
+│   │   ├── security.go          Security header/CORS/SSL/WAF/CMS checks
+│   │   ├── injections.go        SQL/XSS/CRLF/SSTI/Host Header/Dir Traversal
+│   │   ├── advanced.go          JWT/GraphQL/WebSocket/Supply Chain/Email
+│   │   ├── dsl.go + dslv2.go    DSL rule engine (v1 regex + v2 AST parser)
+│   │   ├── ports.go             TCP port scanning & banner grabbing
+│   │   ├── paths.go             Directory brute-force & content validation
+│   │   ├── dns.go               DNS resolution, zone transfer, subdomains
+│   │   ├── recon.go             IP geolocation, ASN, WHOIS, Shodan
+│   │   ├── scoring.go           Risk score calculation (0–100)
+│   │   ├── mutation.go          Payload mutation engine
+│   │   ├── update.go            GitHub auto-update with SHA256
+│   │   ├── cache.go             In-memory LRU cache with TTL
+│   │   └── wordlists.go         All paths, WAF/CMS/version signatures
+│   ├── gui/                     Fyne desktop GUI
+│   ├── model/report.go          Report data structure (116 fields)
+│   ├── export/html.go           JSON/HTML/TXT export
+│   ├── notifier/
+│   │   ├── webhook.go           Webhook sender with SSRF DNS-pinning
+│   │   └── crypto.go            AES-256-GCM secret encryption
+│   └── plugin/
+│       ├── manager.go           Plugin manager + 7 custom list types
+│       └── dsl.go               Plugin condition evaluator
+├── plugins/                     Plugin directory + custom lists
+├── docs/                        This documentation
+├── go.mod / go.sum              Go module dependencies
+└── dsl_rules.json               Custom DSL rules</code></pre>
+</div>
+</section>
+
+<!-- QUICK START -->
+<section id="quickstart">
+<h2>Quick Start</h2>
+
+<div class="step"><div class="step-num">1</div><div class="step-text"><strong>Launch the application</strong><br>Run <code>sc-checker.exe</code> (single binary, no dependencies). The Fyne desktop GUI opens.</div></div>
+
+<div class="step"><div class="step-num">2</div><div class="step-text"><strong>Enter a target</strong><br>Type a URL or IP in the top input field:<br><code>https://example.com</code> or <code>example.com</code> or <code>1.2.3.4</code><br>Press Enter or click <strong>Scan</strong>.</div></div>
+
+<div class="step"><div class="step-num">3</div><div class="step-text"><strong>Watch the scan progress</strong><br>The progress bar and status label update in real-time. The log shows each phase: normalization → DNS → connectivity → headers → security → SSL → DNS/recon → ports → paths → injections → advanced → recon → scoring.</div></div>
+
+<div class="step"><div class="step-num">4</div><div class="step-text"><strong>Explore results</strong><br>Switch between tabs: <strong>Dashboard</strong> (overview, security, injections, advanced, DNS, SSL, recon, deep scan, paths, ports), <strong>Report</strong> (full JSON + export buttons), <strong>Webhooks</strong>, <strong>Proxy</strong>, <strong>Plugins & DSL</strong>.</div></div>
+
+<div class="step"><div class="step-num">5</div><div class="step-text"><strong>Export the report</strong><br>In the <strong>Report</strong> tab, click JSON / HTML / TXT to save the scan results.</div></div>
+
+<h3>Configuration Files</h3>
+<div class="card">
+<table>
+<tr><td><code>plugins/custom/headers.txt</code></td><td>Custom HTTP headers (key: value)</td></tr>
+<tr><td><code>plugins/custom/ports.txt</code></td><td>Additional ports to scan</td></tr>
+<tr><td><code>plugins/custom/wordlist.txt</code></td><td>Additional paths to brute-force</td></tr>
+<tr><td><code>plugins/custom/subdomains.txt</code></td><td>Additional subdomains to check</td></tr>
+<tr><td><code>plugins/custom/useragents.txt</code></td><td>User-Agent rotation list</td></tr>
+<tr><td><code>plugins/custom/payloads.txt</code></td><td>Custom SQLi/XSS payloads</td></tr>
+<tr><td><code>plugins/custom/blacklist.txt</code></td><td>Paths to exclude from scanning</td></tr>
+<tr><td><code>webhooks.json</code></td><td>Webhook URLs (encrypted)</td></tr>
+<tr><td><code>proxy_settings.json</code></td><td>Proxy configuration</td></tr>
+<tr><td><code>dsl_rules.json</code></td><td>Custom DSL rules</td></tr>
+<tr><td><code>plugins/*.json</code></td><td>JSON plugin definitions</td></tr>
+</table>
+</div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+<h2>Features</h2>
+
+<div class="card"><h4>Security Checks</h4><p>HSTS, Clickjacking (X-Frame-Options + CSP frame-ancestors), CORS (wildcard + origin reflection + credentials), Cookie audit (HttpOnly/Secure/SameSite for sensitive cookies), Mixed Content detection (with 40+ tracking domain exclusions), HTTP→HTTPS redirect, TRACE method, CSP analysis, Permissions-Policy, Referrer-Policy, Directory listing, security.txt discovery.</p></div>
+
+<div class="card"><h4>SSL/TLS Analysis</h4><p>Certificate expiry (days remaining), weak cipher detection (RC4/DES/3DES/NULL/EXPORT/MD5), weak protocol detection (≤TLS 1.1), Subject/Issuer/SAN extraction, serial number, deep SSL info.</p></div>
+
+<div class="card"><h4>Port Scanning</h4><p>34 common ports: 21(FTP), 22(SSH), 25(SMTP), 53(DNS), 80(HTTP), 443(HTTPS), 3306(MySQL), 5432(PostgreSQL), 6379(Redis), 27017(MongoDB), 3389(RDP), etc. Banner grabbing with protocol-specific probes (HTTP, SMTP). Custom ports from plugin lists.</p></div>
+
+<div class="card"><h4>WAF Detection (14 signatures)</h4><p>Cloudflare, AWS WAF, ModSecurity, Imperva/Incapsula, Akamai, Sucuri, Wordfence, Barracuda, F5 BIG-IP, FortiWeb, DenyAll, Radware, Citrix, Kona. Both header and body-based detection.</p></div>
+
+<div class="card"><h4>CMS/Framework Detection (19 signatures)</h4><p>WordPress, Joomla, Drupal, Laravel, Django, Spring, Express, Next.js, Nuxt.js, Angular, ASP.NET, Ghost, Shopify, Magento, Ruby on Rails, Flask, Symfony, React, Vue.js.</p></div>
+
+<div class="card"><h4>Version Fingerprinting (37 patterns)</h4><p>Nginx, Apache, PHP, IIS, LiteSpeed, OpenResty, Caddy, Varnish, Tomcat, Jetty, Undertow, MySQL, MariaDB, PostgreSQL, WordPress, Drupal, Joomla, jQuery, React, Vue.js, Angular, Bootstrap, Node.js, Express, Python, Ruby, Rails, cURL, Wget.</p></div>
+
+<div class="card"><h4>Reconnaissance</h4><p>DNS records (MX, NS, TXT), subdomain enumeration (80+ wordlist), reverse DNS, zone transfer check, email extraction, phone number extraction, social link detection, external link collection, JS library detection (jQuery, React, Vue, Bootstrap, Lodash, Axios), meta tag extraction, hidden form discovery.</p></div>
+
+<div class="card"><h4>External Services</h4><p>IP geolocation (ip-api.com), ASN lookup (ipinfo.io), WHOIS (rdap.org + TCP fallback), Shodan (internetdb.shodan.io), Certificate Transparency logs (crt.sh).</p></div>
+</section>
+
+<!-- SCAN WORKFLOW -->
+<section id="scan-workflow">
+<h2>Scan Workflow</h2>
+<p>The scanner executes 28 stages in a deterministic pipeline:</p>
+
+<pre><code> 1. Target normalization        (validate URL, block private IPs)
+ 2. DNS resolution              (A/AAAA record lookup)
+ 3. Connectivity probe          (TCP dial on primary + alt ports)
+ 4. Server node detection       (non-HTTP hosts get TCP-only scan)
+ 5. Root HTTP probe             (initial request, status, redirect)
+ 6. Alternative port probing    (8080, 8443, 8000, 5000, etc.)
+ 7. Header collection           (all response headers → map)
+ 8. Security checks             (headers, cookies, WAF, CMS, versions)
+ 9. Concurrent checks           (methods, CORS, HTTPS redirect, XSS, SQL)
+10. SSL/TLS check               (certificate, cipher, protocol)
+11. DNS & recon checks          (MX, NS, TXT, subs, reverse, robots, sitemap)
+12. Port scanning               (34+ ports, concurrent TCP dialers)
+13. Path brute-force            (500+ paths across 8 frameworks)
+14. Extraction                  (emails, phones, social, JS libraries)
+15. Injection checks            (CRLF, Host Header, Open Redirect, Dir Traversal)
+16. Leak detection              (backups, source leaks, admin panels, login pages)
+17. Mutation tests              (payload variants against SQL/XSS endpoints)
+18. HTTP methods full           (GET, HEAD, POST, PUT, DELETE, PATCH, OPTIONS, TRACE)
+19. Exploit verification        (re-test with stronger payloads)
+20. Performance metrics         (TTFB, content size, encoding, redirect chain)
+21. CSP/security.txt analysis
+22. Advanced checks             (JWT, GraphQL, WebSocket, Supply Chain, etc.)
+23. DSL evaluation              (v2 AST + v1 rules)
+24. CVSS scoring                (severity ratings for findings)
+25. Recon services              (ip-api, ipinfo, rdap, Shodan, crt.sh)
+26. Anomaly hints               (summary of noteworthy findings)
+27. Risk scoring                (0–100 score with level classification)</code></pre>
+</section>
+
+<!-- SECURITY CHECKS -->
+<section id="security-checks">
+<h2>Security Checks</h2>
+
+<h3>Security Headers</h3>
+<table>
+<tr><th>Header</th><th>Check</th></tr>
+<tr><td>Content-Security-Policy</td><td>Present + unsafe-inline/unsafe-eval/wildcard/data: analysis</td></tr>
+<tr><td>X-Frame-Options</td><td>DENY or SAMEORIGIN</td></tr>
+<tr><td>X-Content-Type-Options</td><td>nosniff</td></tr>
+<tr><td>Referrer-Policy</td><td>Present</td></tr>
+<tr><td>Permissions-Policy</td><td>Present</td></tr>
+<tr><td>Strict-Transport-Security</td><td>Present or in HSTS preload list (~100 domains)</td></tr>
+</table>
+
+<h3>CORS Testing</h3>
+<p>Tests wildcard origin (<code>*</code>), origin reflection, and credentials exposure against <code>https://evil.com</code> and <code>null</code> origins.</p>
+
+<h3>Cookie Audit</h3>
+<p>Only flags sensitive cookies (session, auth, CSRF, JWT tokens — 20+ patterns). Checks HttpOnly, Secure, and SameSite attributes. Tracking/analytics cookies are ignored.</p>
+
+<h3>Mixed Content</h3>
+<p>Finds <code>http://</code> resources in <code>&lt;script&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;iframe&gt;</code>, <code>&lt;link&gt;</code>, <code>&lt;video&gt;</code>, <code>&lt;audio&gt;</code>, <code>&lt;source&gt;</code>, <code>&lt;embed&gt;</code>, and <code>&lt;object&gt;</code> tags. Excludes 40+ known tracking/CDN domains to reduce false positives.</p>
+
+<h3>SSL/TLS</h3>
+<ul>
+  <li>Certificate expiry: &lt;30 days = <span class="tag tag-o">HIGH</span></li>
+  <li>Weak ciphers: RC4, DES, 3DES, NULL, EXPORT, MD5</li>
+  <li>Weak protocols: TLS 1.0, TLS 1.1</li>
+  <li>Subject, Issuer, SAN, serial number extraction</li>
+</ul>
+</section>
+
+<!-- INJECTIONS -->
+<section id="injections">
+<h2>Injection Testing</h2>
+
+<div class="card"><h4>SQL Injection</h4><p>Injects <code>'</code> and <code>%27</code> into query parameters. Detects 7 SQL error indicators (MySQL, PostgreSQL, MSSQL, Oracle, SQLite). Score: <span class="tag tag-r">+10 per finding</span>.</p></div>
+
+<div class="card"><h4>XSS Reflection</h4><p>Injects a unique token, strips <code>&lt;script&gt;</code>, <code>&lt;style&gt;</code>, <code>&lt;noscript&gt;</code>, attributes, URLs, meta tags, and comments from the response before checking for reflection. Score: <span class="tag tag-r">+10</span>.</p></div>
+
+<div class="card"><h4>SSTI (Server-Side Template Injection)</h4><p>Tests 4 template engines with payloads expecting mathematical evaluation:</p>
+<table>
+<tr><td><span class="tag tag-b">Jinja2/Twig</span></td><td><code>{{7*7}}</code></td><td>Expects <code>49</code></td></tr>
+<tr><td><span class="tag tag-b">FreeMarker/Velocity</span></td><td><code>${7*7}</code></td><td>Expects <code>49</code></td></tr>
+<tr><td><span class="tag tag-b">ERB</span></td><td><code>&lt;%= 7*7 %&gt;</code></td><td>Expects <code>49</code></td></tr>
+<tr><td><span class="tag tag-b">Ruby/Slim</span></td><td><code>#{7*7}</code></td><td>Expects <code>49</code></td></tr>
+</table>
+</div>
+
+<div class="card"><h4>CRLF Injection</h4><p>Injects <code>%0d%0a</code> into URL paths and query parameters. Score: <span class="tag tag-o">+6 per finding</span>.</p></div>
+
+<div class="card"><h4>Host Header Injection</h4><p>Spoofs Host header to detect server-side request forgery or header injection vulnerabilities. Score: <span class="tag tag-o">+5</span>.</p></div>
+
+<div class="card"><h4>Open Redirect</h4><p>Tests <code>redirect</code>, <code>url</code>, <code>next</code>, <code>return</code> parameters with external URLs. Score: <span class="tag tag-o">+5</span>.</p></div>
+
+<div class="card"><h4>Directory Traversal</h4><p>Tests <code>../../../etc/passwd</code> and <code>..\..\..\windows\win.ini</code> path traversal patterns.</p></div>
+
+<h3>Payload Mutation Engine</h3>
+<p>SQL and XSS payloads are mutated through 10 variant generators before testing:</p>
+<ul>
+  <li>URL encoding (single + double)</li>
+  <li>HTML entity encoding</li>
+  <li>Comment-space injection</li>
+  <li>Null byte prefix/suffix</li>
+  <li>Backtick substitution</li>
+  <li>Case swapping</li>
+</ul>
+</section>
+
+<!-- PATH BRUTE-FORCE -->
+<section id="path-brute">
+<h2>Path Brute-Force</h2>
+
+<h3>Framework Wordlists</h3>
+<table>
+<tr><th>Framework</th><th>Paths</th><th>Example</th></tr>
+<tr><td>Generic</td><td>50+</td><td>.env, .git/config, backup.sql, phpinfo.php, debug.log</td></tr>
+<tr><td>WordPress</td><td>16</td><td>wp-admin, wp-login.php, xmlrpc.php, wp-json/wp/v2/users/</td></tr>
+<tr><td>Laravel</td><td>8</td><td>artisan, .env, storage/logs/laravel.log, .env.example</td></tr>
+<tr><td>Drupal</td><td>8</td><td>sites/default/settings.php, core/CHANGELOG.txt</td></tr>
+<tr><td>Joomla</td><td>6</td><td>administrator/, configuration.php</td></tr>
+<tr><td>Spring Boot</td><td>10</td><td>actuator/env, actuator/heapdump, swagger-ui.html</td></tr>
+<tr><td>Django</td><td>6</td><td>admin/, __debug__/, accounts/login/</td></tr>
+<tr><td>Next.js</td><td>5</td><td>_next/, api/auth/, api/graphql</td></tr>
+</table>
+
+<h3>Critical Path Validation</h3>
+<p>15 critical paths have content validation rules to eliminate false positives. For example:</p>
+<ul>
+  <li><code>.env</code> — must contain <code>=</code>, <code>APP_</code>, <code>DB_</code>, <code>SECRET</code>, <code>KEY=</code>, or <code>PASSWORD</code></li>
+  <li><code>id_rsa</code> — must contain <code>BEGIN</code>, <code>PRIVATE KEY</code>, <code>ssh-rsa</code>, or <code>-----BEGIN</code></li>
+  <li><code>actuator/env</code> — must contain <code>{</code>, <code>spring</code>, <code>server.port</code>, or <code>environment</code></li>
+  <li><code>.git/config</code> — must contain <code>[core]</code>, <code>repositoryformatversion</code>, or <code>[remote</code></li>
+</ul>
+
+<h3>Soft-404 Filtering</h3>
+<p>10 soft-404 signatures prevent false path discoveries: "page not found", "404 not found", "no results found", etc. Paths matching these patterns are excluded unless critical content rules validate them.</p>
+</section>
+
+<!-- ADVANCED CHECKS -->
+<section id="advanced-checks">
+<h2>Advanced Checks</h2>
+
+<h3>JWT Analysis</h3>
+<p>Scans response headers and body for JWT tokens. Base64-decodes header and payload. Checks for:</p>
+<ul><li><code>alg: none</code> — <span class="tag tag-r">CRITICAL</span></li><li><code>alg: HS256</code> — brute-forceable</li><li>Sensitive data in payload (passwords, keys, tokens)</li></ul>
+
+<h3>GraphQL Scanning</h3>
+<p>Probes <code>/graphql</code>, <code>/api/graphql</code>, <code>/gql</code>. Sends <code>{__typename}</code> to detect. Runs introspection query for full schema. Detects: introspection enabled, deprecated fields, sensitive mutations, debug mode.</p>
+
+<h3>WebSocket Testing</h3>
+<p>Probes <code>/ws</code>, <code>/socket</code>, <code>/websocket</code> (ws:// and wss://). Tests: XSS payload reflection, template injection (SSTI), 65KB DoS payload.</p>
+
+<h3>HTTP Smuggling</h3>
+<p>Tests CL.TE and TE.CL request smuggling: manipulates Content-Length and Transfer-Encoding headers to detect desync vulnerabilities. Score: <span class="tag tag-r">+10 per finding</span>.</p>
+
+<h3>Supply Chain Analysis</h3>
+<p>Extracts external <code>&lt;script&gt;</code> and <code>&lt;link&gt;</code> URLs. Checks: HTTP vs HTTPS, CDN identification, vulnerable versions (jQuery &lt;1.7, AngularJS 1.x, Moment.js, Bootstrap 3, Lodash 4), CORS wildcard.</p>
+
+<h3>Email Security</h3>
+<p>Checks SPF, DMARC (warns on <code>p=none</code>), DKIM (6 selectors: default, google, selector1, k1, dkim, mail).</p>
+
+<h3>Subdomain Takeover</h3>
+<p>Checks subdomains against Heroku, GitHub Pages, Surge.sh, AWS S3 takeover signatures.</p>
+
+<h3>SSTI (Server-Side Template Injection)</h3>
+<p>Tests Jinja2/Twig, FreeMarker/Velocity, ERB, Ruby/Slim engines via GET and POST.</p>
+
+<h3>Other Checks</h3>
+<ul>
+  <li><strong>Tech Stack Deep</strong> — identifies Apache/Nginx/IIS/Cloudflare/WordPress/Laravel/Next.js/Nuxt.js/Angular/PHP</li>
+  <li><strong>Hidden Endpoints</strong> — extracts URLs from JS strings and API patterns</li>
+  <li><strong>Rate Limiting</strong> — 10 rapid requests to detect 429/503</li>
+  <li><strong>Session Manipulation</strong> — checks if session cookies are fixed across requests</li>
+  <li><strong>Chaos Scan</strong> — null bodies, SQL injection, admin=true, debug parameters</li>
+  <li><strong>CORS Deep</strong> — tests null/localhost/evil.com/subdomain/double hostname/HTTP downgrade</li>
+  <li><strong>WAF Fingerprint Deep</strong> — extracts WAF version from X- headers</li>
+  <li><strong>CVE Lookup</strong> — queries NIST NVD API v2.0 for detected versions</li>
+  <li><strong>CVSS Scoring</strong> — severity ratings (SQLi=9.5, XSS=7.5, Open Redirect=5.0, etc.)</li>
+  <li><strong>Exploit Verification</strong> — re-tests with stronger payloads to reduce false positives</li>
+</ul>
+</section>
+
+<!-- RISK SCORING -->
+<section id="risk-scoring">
+<h2>Risk Scoring</h2>
+<p>Risk score is calculated on a 0–100 scale with 25+ contributing factors:</p>
+
+<table>
+<tr><th>Factor</th><th>Max Score</th><th>Per Item</th></tr>
+<tr><td>Critical paths found</td><td>30</td><td>15</td></tr>
+<tr><td>SQL errors</td><td>20</td><td>10</td></tr>
+<tr><td>SSTI findings</td><td>16</td><td>8</td></tr>
+<tr><td>HTTP smuggling</td><td>20</td><td>10</td></tr>
+<tr><td>Source leaks</td><td>20</td><td>10</td></tr>
+<tr><td>Exploit verified</td><td>16</td><td>8</td></tr>
+<tr><td>CVE findings</td><td>15</td><td>5</td></tr>
+<tr><td>CORS issues</td><td>12</td><td>6</td></tr>
+<tr><td>Open ports</td><td>12</td><td>2</td></tr>
+<tr><td>CRLF injection</td><td>12</td><td>6</td></tr>
+<tr><td>Missing headers</td><td>10</td><td>2</td></tr>
+<tr><td>XSS reflection</td><td>10</td><td>once</td></tr>
+<tr><td>GraphQL vulns</td><td>10</td><td>5</td></tr>
+<tr><td>Backup files</td><td>10</td><td>5</td></tr>
+<tr><td>Admin panels</td><td>10</td><td>5</td></tr>
+<tr><td>Cookie issues</td><td>9</td><td>3</td></tr>
+<tr><td>TRACE enabled</td><td>8</td><td>once</td></tr>
+<tr><td>Risky methods (PUT/DELETE)</td><td>8</td><td>once</td></tr>
+<tr><td>SSL expiry &lt;30d</td><td>8</td><td>once</td></tr>
+<tr><td>SSL weak cipher</td><td>8</td><td>once</td></tr>
+<tr><td>JWT tokens</td><td>6</td><td>3</td></tr>
+<tr><td>Directory listing</td><td>6</td><td>once</td></tr>
+<tr><td>Open redirect</td><td>5</td><td>once</td></tr>
+<tr><td>Host header injection</td><td>5</td><td>once</td></tr>
+<tr><td>No HTTPS redirect</td><td>4</td><td>once</td></tr>
+<tr><td>Mixed content</td><td>4</td><td>once</td></tr>
+<tr><td>No clickjacking protection</td><td>4</td><td>once</td></tr>
+<tr><td>No HSTS</td><td>3</td><td>once</td></tr>
+</table>
+
+<h3>Risk Levels</h3>
+<table>
+<tr><td><span class="tag tag-g">0–9</span></td><td><strong>INFO</strong></td><td>No significant issues</td></tr>
+<tr><td><span class="tag tag-b">10–29</span></td><td><strong>LOW</strong></td><td>Minor findings</td></tr>
+<tr><td><span class="tag tag-o">30–49</span></td><td><strong>MEDIUM</strong></td><td>Notable issues</td></tr>
+<tr><td><span class="tag tag-o">50–69</span></td><td><strong>HIGH</strong></td><td>Serious vulnerabilities</td></tr>
+<tr><td><span class="tag tag-r">70–100</span></td><td><strong>CRITICAL</strong></td><td>Severe vulnerabilities</td></tr>
+</table>
+</section>
+
+<!-- DSL -->
+<section id="dsl">
+<h2>DSL Rules Engine</h2>
+
+<h3>DSL v1 — JSON Rule Format</h3>
+<p>Define conditions in JSON that are evaluated against the scan report:</p>
+<pre><code>[
+  {
+    "name": "No HSTS",
+    "condition": "hsts_enabled == false",
+    "severity": "HIGH",
+    "message": "HSTS not enabled"
+  },
+  {
+    "name": "SSL Expiring",
+    "condition": "ssl_expiry_days < 30",
+    "severity": "HIGH",
+    "message": "SSL certificate expires within 30 days"
+  }
+]</code></pre>
+
+<h3>DSL v2 — AST-Based Mini-Language</h3>
+<p>A full programming language parsed by a recursive-descent parser with AST safety validation:</p>
+<pre><code>IF critical_paths_count > 0 THEN
+  ASSERT risk_score > 20
+ELSE
+  ASSERT risk_score >= 0
+END
+
+IF open_ports_count > 10 THEN
+  ASSERT risk_score > 10
+END
+
+IF ssl_weak_cipher == true THEN
+  ASSERT risk_score > 30
+END
+
+FOR $port IN open_ports
+  ASSERT $port > 0
+END
+
+FOR $sub IN subdomains
+  CAPTURE "www" FROM target
+END</code></pre>
+
+<h3>DSL v2 Language Reference</h3>
+<table>
+<tr><td><code>$var = expr</code></td><td>Variable assignment</td></tr>
+<tr><td><code>IF cond THEN ... ELSE ... END</code></td><td>Conditional block</td></tr>
+<tr><td><code>FOR $item IN list ... END</code></td><td>Loop over report list field</td></tr>
+<tr><td><code>ASSERT cond</code></td><td>Assertion (fails = HIGH severity)</td></tr>
+<tr><td><code>CAPTURE "regex" FROM field</code></td><td>Regex capture from report field</td></tr>
+<tr><td><code>REQUEST "url" CHECK RESPONSE CONTAINS "text"</code></td><td>HTTP request with content check</td></tr>
+<tr><td><code>HTTP_TIME "url" &lt;|&gt; ms</code></td><td>Response time threshold check</td></tr>
+<tr><td><code>RETURN</code></td><td>Early return from program</td></tr>
+</table>
+
+<h3>Available Fields</h3>
+<p>Boolean: <code>hsts_enabled</code>, <code>http_to_https_redirect</code>, <code>clickjacking_protected</code>, <code>xss_reflection</code>, <code>trace_enabled</code>, <code>ssl_weak_cipher</code>, <code>mixed_content</code>, <code>server_node</code></p>
+<p>Numeric: <code>risk_score</code>, <code>status_code</code>, <code>ssl_expiry_days</code>, <code>response_time_ms</code>, <code>scan_duration_ms</code>, <code>port</code></p>
+<p>String: <code>target</code>, <code>ip</code>, <code>host</code>, <code>risk_level</code>, <code>server_banner</code>, <code>normalized_url</code></p>
+<p>Counts: <code>critical_paths_count</code>, <code>open_ports_count</code>, <code>subdomains_count</code>, <code>sql_errors_count</code>, <code>cors_issues_count</code>, <code>cookie_issues_count</code>, <code>cve_findings_count</code>, <code>ssti_results_count</code>, <code>graphql_vulns_count</code>, <code>admin_panels_count</code>, <code>source_leak_count</code>, <code>backup_files_count</code>, etc.</p>
+
+<h3>AST Safety Validation</h3>
+<p>Before execution, the AST is validated:</p>
+<ul>
+  <li>All field references checked against a whitelist of 30+ allowed fields</li>
+  <li>REQUEST URLs blocked if they contain <code>localhost</code>, <code>127.</code>, or <code>@</code></li>
+  <li>CAPTURE regex patterns validated at parse time</li>
+  <li>Unknown node types rejected</li>
+  <li>Unknown operators rejected</li>
+</ul>
+</section>
+
+<!-- PLUGINS -->
+<section id="plugins">
+<h2>Plugins</h2>
+
+<h3>JSON Plugins</h3>
+<p>Define plugins as JSON files in the <code>plugins/</code> directory:</p>
+<pre><code>{
+  "name": "Critical Path Alert",
+  "version": "1.0.0",
+  "author": "Security Team",
+  "hooks": ["on_scan_complete"],
+  "condition": "critical_paths_count > 0",
+  "action": "append_finding",
+  "severity": "CRITICAL",
+  "message": "Found {critical_paths_count} critical paths on {target}"
+}</code></pre>
+
+<h3>Executable Plugins</h3>
+<p>Place <code>.exe</code>, <code>.bat</code>, <code>.ps1</code>, or <code>.cmd</code> files in <code>plugins/</code>. They receive JSON via stdin and output findings on stdout:</p>
+<pre><code>Input (stdin):  {"hook": "on_scan_complete", "target": "example.com", "report": {...}}
+Output (stdout): [{"severity": "high", "title": "Found issue", "detail": "..."}]</code></pre>
+<p>30-second timeout (60s on Windows) prevents hung plugins from blocking scans.</p>
+
+<h3>Plugin Hooks (9 available)</h3>
+<table>
+<tr><th>Hook</th><th>When</th><th>Available Data</th></tr>
+<tr><td><code>on_scan_start</code></td><td>Scan begins</td><td>Target, full report (empty)</td></tr>
+<tr><td><code>on_before_request</code></td><td>Before each HTTP call</td><td>URL, method, headers</td></tr>
+<tr><td><code>on_request</code></td><td>After each HTTP call</td><td>URL, method, status, error</td></tr>
+<tr><td><code>on_after_dns</code></td><td>After DNS resolution</td><td>IP, host, full report</td></tr>
+<tr><td><code>on_after_headers</code></td><td>After header collection</td><td>All response headers</td></tr>
+<tr><td><code>on_after_ssl</code></td><td>After SSL/TLS check</td><td>Certificate info, cipher</td></tr>
+<tr><td><code>on_after_ports</code></td><td>After port scan</td><td>Open ports, banners</td></tr>
+<tr><td><code>on_after_paths</code></td><td>After path brute-force</td><td>Discovered paths, critical</td></tr>
+<tr><td><code>on_after_recon</code></td><td>After all recon</td><td>IP geo, ASN, WHOIS, Shodan, CT logs</td></tr>
+<tr><td><code>on_scan_complete</code></td><td>Scan finished</td><td>Full report with all results</td></tr>
+<tr><td><code>on_export</code></td><td>Report export</td><td>Full report</td></tr>
+</table>
+
+<h3>Condition Operators</h3>
+<p><code>==</code>, <code>!=</code>, <code>></code>, <code><</code>, <code>>=</code>, <code><=</code>, <code>contains</code> — combined with <code>AND</code>, <code>OR</code>, <code>NOT</code>.</p>
+
+<h3>Message Interpolation</h3>
+<p>Plugin messages support variable substitution:</p>
+<table>
+<tr><td><code>{target}</code></td><td>Scan target</td></tr>
+<tr><td><code>{risk_score}</code></td><td>Risk score (0–100)</td></tr>
+<tr><td><code>{risk_level}</code></td><td>info/low/medium/high/critical</td></tr>
+<tr><td><code>{critical_paths_count}</code></td><td>Number of critical paths</td></tr>
+<tr><td><code>{open_ports_count}</code></td><td>Open port count</td></tr>
+<tr><td><code>{subdomains_count}</code></td><td>Subdomain count</td></tr>
+<tr><td><code>{cve_count}</code></td><td>CVE findings count</td></tr>
+<tr><td><code>{status_code}</code></td><td>HTTP status code</td></tr>
+<tr><td><code>{ip}</code></td><td>Resolved IP address</td></tr>
+</table>
+</section>
+
+<!-- CUSTOM LISTS -->
+<section id="custom-lists">
+<h2>Custom Lists</h2>
+<p>7 types of custom wordlists stored in <code>plugins/custom/</code>, editable via GUI or directly as text files:</p>
+
+<table>
+<tr><th>File</th><th>Purpose</th><th>Format</th></tr>
+<tr><td><code>headers.txt</code></td><td>Custom HTTP headers</td><td><code>Key: Value</code> per line</td></tr>
+<tr><td><code>payloads.txt</code></td><td>SQLi/XSS payloads</td><td>One payload per line</td></tr>
+<tr><td><code>ports.txt</code></td><td>Additional ports to scan</td><td>One port number per line</td></tr>
+<tr><td><code>subdomains.txt</code></td><td>Subdomain wordlist</td><td>One subdomain prefix per line</td></tr>
+<tr><td><code>useragents.txt</code></td><td>User-Agent rotation</td><td>One UA string per line</td></tr>
+<tr><td><code>blacklist.txt</code></td><td>Paths to exclude</td><td>One path per line</td></tr>
+<tr><td><code>wordlist.txt</code></td><td>Custom path wordlist</td><td>One path per line</td></tr>
+</table>
+
+<p>Lines starting with <code>#</code> are treated as comments. Empty lines are ignored.</p>
+
+<h3>User-Agent Rotation</h3>
+<p>When <code>useragents.txt</code> contains entries, the HTTP client rotates through them — each request uses the next UA. Every 8 requests, a random jump is made (to avoid pattern detection). If the list is empty, the default UA is used: <code>Mozilla/5.0 (compatible; SC-Checker-Go/1.0)</code>.</p>
+</section>
+
+<!-- WEBHOOKS -->
+<section id="webhooks">
+<h2>Webhooks</h2>
+<p>Send scan results to 5 notification channels:</p>
+
+<h3>Discord</h3>
+<pre><code>https://discord.com/api/webhooks/WEBHOOK_ID/WEBHOOK_TOKEN</code></pre>
+<p>Rich embed with color-coded risk level, fields for score/status/ports/WAF/critical paths.</p>
+
+<h3>Slack</h3>
+<pre><code>https://hooks.slack.com/services/T000/B000/XXXXX</code></pre>
+<p>Markdown-formatted message with key metrics.</p>
+
+<h3>Telegram</h3>
+<pre><code>BOT_TOKEN|CHAT_ID</code></pre>
+<p>Markdown message sent via Telegram Bot API.</p>
+
+<h3>Pushover</h3>
+<pre><code>APP_TOKEN|USER_KEY</code></pre>
+<p>Push notification with risk-priority level.</p>
+
+<h3>Custom HTTP</h3>
+<pre><code>https://your-server.com/webhook</code></pre>
+<p>JSON POST with full scan summary: <code>{"event":"scan_complete","target":"...","risk":...,...}</code></p>
+
+<h3>SSRF Protection (DNS-Pinning)</h3>
+<p>All webhook requests use DNS-pinning to prevent Server-Side Request Forgery:</p>
+<ol>
+  <li>Resolve webhook hostname to IP via DNS</li>
+  <li>Validate all resolved IPs — reject loopback, private, link-local</li>
+  <li>Connect directly to the pinned IP (not hostname)</li>
+  <li>Set original Host header on the HTTP request</li>
+  <li>Custom TLS config with <code>InsecureSkipVerify</code> for pinned connections</li>
+</ol>
+
+<h3>Secret Encryption</h3>
+<p>All webhook URLs are encrypted using AES-256-GCM before storage. The prefix <code>enc:</code> in <code>webhooks.json</code> indicates encrypted values. Legacy plaintext values are read transparently (backward compatible).</p>
+</section>
+
+<!-- PROXY -->
+<section id="proxy">
+<h2>Proxy Settings</h2>
+
+<div class="card">
+<h4>Supported Proxy Types</h4>
+<ul>
+  <li>HTTP proxy: <code>http://proxy.example.com:8080</code></li>
+  <li>SOCKS5 proxy: <code>socks5://127.0.0.1:9050</code></li>
+</ul>
+</div>
+
+<div class="card">
+<h4>Configuration</h4>
+<ul>
+  <li><strong>Proxy URL</strong> — enter the proxy address</li>
+  <li><strong>Timeout</strong> — request timeout in seconds (default: 15)</li>
+  <li><strong>Verify SSL</strong> — enable/disable SSL verification</li>
+  <li><strong>Enabled</strong> — toggle proxy on/off</li>
+</ul>
+</div>
+
+<div class="card">
+<h4>Test Connection</h4>
+<p>Click <strong>Test Connection</strong> to verify the proxy works. Sends a request to <code>http://httpbin.org/ip</code> through the proxy and shows the response.</p>
+</div>
+
+<div class="card">
+<h4>Rebuild Engine</h4>
+<p>After changing proxy settings, click <strong>Rebuild Engine</strong> to recreate the HTTP client pool with the new configuration. All 24 concurrent clients will use the updated proxy.</p>
+</div>
+</section>
+
+<!-- REPORT EXPORT -->
+<section id="export">
+<h2>Report Export</h2>
+
+<h3>JSON</h3>
+<p>Full machine-readable report with all 116 fields. Ideal for programmatic processing, data pipeline integration, or archiving.</p>
+<pre><code>{
+  "target": "example.com",
+  "risk_score": 21,
+  "risk_level": "low",
+  "open_ports": [80, 443, 8080],
+  "critical_paths": [],
+  "cve_findings": [...],
+  ...
+}</code></pre>
+
+<h3>HTML</h3>
+<p>Self-contained, dark-themed HTML report with all sections rendered as cards and tables. Color-coded severity badges. No external dependencies — a single <code>.html</code> file you can open in any browser.</p>
+
+<h3>TXT</h3>
+<p>Plain-text formatted report suitable for terminals, logs, or email. Sections separated by headers and indentation.</p>
+
+<h3>Report Sections</h3>
+<ul>
+  <li>Target info + risk score + status</li>
+  <li>Security checks table (pass/fail)</li>
+  <li>SSL/TLS details (version, cipher, expiry, SAN)</li>
+  <li>Open ports with service names</li>
+  <li>Discovered paths with status codes</li>
+  <li>Critical paths (validated)</li>
+  <li>CVE findings with CVSS scores</li>
+  <li>Injection test results</li>
+  <li>Advanced findings (JWT, GraphQL, WebSocket, etc.)</li>
+  <li>Reconnaissance (DNS, WHOIS, Shodan, CT logs)</li>
+  <li>Plugin findings</li>
+  <li>Scan metadata (duration, proxy, errors)</li>
+</ul>
+</section>
+
+<!-- AUTO-UPDATE -->
+<section id="auto-update">
+<h2>Auto-Update</h2>
+
+<h3>Update Check</h3>
+<p>On startup, SC Checker checks the latest GitHub release. If a newer version is available, a dialog shows the changelog and offers to update.</p>
+
+<h3>SHA256 Verification</h3>
+<p>Before installing, the downloaded binary is verified against the SHA256 checksum from the release assets. If the hash doesn't match, the update is refused — preventing corrupted or tampered downloads.</p>
+
+<h3>Update Process (Windows)</h3>
+<ol>
+  <li>Download new <code>.exe</code> to a temp file</li>
+  <li>Verify SHA256 checksum (required)</li>
+  <li>Generate a batch script that:
+    <ul>
+      <li>Waits 2 seconds (for the app to exit)</li>
+      <li>Renames old <code>.exe</code> → <code>.old</code></li>
+      <li>Moves new <code>.exe</code> into place</li>
+      <li>Launches the updated app</li>
+      <li>Self-deletes the batch script</li>
+    </ul>
+  </li>
+  <li>On failure: restores <code>.old</code> and launches original version</li>
+</ol>
+
+<h3>Requirements</h3>
+<ul>
+  <li>GitHub repository: <code>Krimex1/SC-Checker</code></li>
+  <li>Releases must include the <code>.exe</code> asset</li>
+  <li>Optional: <code>sha256sums.txt</code> for hash verification</li>
+  <li>Version format: <code>vX.Y.Z</code> (semver)</li>
+</ul>
+</section>
+
+</div>
+
+<script>
+const nav = document.getElementById('nav');
+const sections = document.querySelectorAll('#main section');
+const links = nav.querySelectorAll('a');
+
+links.forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const id = a.dataset.section;
+    sections.forEach(s => s.classList.remove('active'));
+    links.forEach(l => l.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    a.classList.add('active');
+    search.value = '';
+    nav.querySelectorAll('a').forEach(l => l.style.display = '');
+    window.location.hash = id;
+  });
+});
+
+function filterNav(q) {
+  q = q.toLowerCase();
+  nav.querySelectorAll('a').forEach(a => {
+    if (!q) { a.style.display = ''; return }
+    a.style.display = a.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+if (window.location.hash) {
+  const id = window.location.hash.slice(1);
+  const a = nav.querySelector(`[data-section="${id}"]`);
+  if (a) a.click();
+}
+</script>
+</body>
+</html>
